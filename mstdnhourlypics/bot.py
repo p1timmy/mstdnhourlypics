@@ -3,7 +3,7 @@ import os
 import random
 import socket
 import time
-from typing import Deque
+from typing import Deque, Dict, Union
 
 import schedule
 from mastodon import Mastodon, MastodonError
@@ -74,7 +74,7 @@ class Bot:
                 counter += 1
         _logger.info("Added %s image%s to queue", counter, "s" if counter != 1 else "")
 
-    def send_post(self, media_path: str, body=""):
+    def send_post(self, media_path: str, body="") -> Union[Dict, None]:
         media_id = ""
         while True:
             try:
@@ -91,7 +91,7 @@ class Bot:
                 time.sleep(30)
             except MastodonError:
                 _logger.exception("Failed to publish post")
-                break
+                return None
 
     def post_image(self, no_delay: bool = False):
         # Step 1: Fill up queue if empty
@@ -115,15 +115,19 @@ class Bot:
                 "%s image%s remaining in queue", q_len, "s" if q_len != 1 else ""
             )
 
-        # Step 5: Update and save recent filenames
-        self.recent_files.append(filename)
-        with open(self.settings.recents_file, mode="w") as f:
-            f.write("\n".join(self.recent_files) + "\n")
-        _logger.debug(
-            "Saved paths to last %s images to %s",
-            len(self.recent_files),
-            self.settings.recents_file,
-        )
+            # Step 5: Update and save recent filenames
+            self.recent_files.append(filename)
+            with open(self.settings.recents_file, mode="w") as f:
+                f.write("\n".join(self.recent_files) + "\n")
+            _logger.debug(
+                "Saved paths to last %s images to %s",
+                len(self.recent_files),
+                self.settings.recents_file,
+            )
+        else:
+            _logger.info(
+                "Post for %s will be sent at the next scheduled interval", filename
+            )
 
     def set_up(self):
         # Make sure the images directory exists and is accessible
@@ -136,7 +140,7 @@ class Bot:
     def run(self):
         assert (
             self.logged_in
-        ), "you must run 'set_up()' first before running this function"
+        ), "you must run 'set_up()' or 'log_in()' first before running this function"
 
         # Post immediately if current minute is equal to target minute
         current_min = time.localtime().tm_min
