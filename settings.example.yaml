@@ -1,0 +1,26 @@
+# IMPORTANT: you MUST copy this file as "settings.yaml" before running the bot
+# for the first time!
+#
+# All fields below are optional unless explicitly marked as "REQUIRED",
+# default values are shown with each optional field
+
+# The base URL of the Mastodon instance where your bot account lives (REQUIRED)
+instance_url: https://botsin.space/
+
+# Path to the directory containing images to be posted. Can be an absolute
+# or relative path (REQUIRED)
+images_path: path/to/images
+
+# The number of images to add to the queue at a time. Must be at least 1
+# and has to be an integer, not string. If you don't mind the bot to send
+# some images at least twice in a row, set this to 1.
+image_queue_size: 12
+
+# Minute of the hour when the bot sends its hourly image. Must be between
+# 0 and 59 and has to be an integer, not string.
+minute: 0
+
+# Path to the recently sent images file. It holds a list of filenames of
+# the images recently sent by the bot, separated by newlines. Its maximum
+# size depends on the image_queue_size setting.
+recents_file: "recent_files.txt"
