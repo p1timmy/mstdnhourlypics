@@ -12,8 +12,7 @@ SECRETS_FILE = "secrets.yaml"
 @enforce_types
 @dataclass
 class Settings:
-    name: str
-    api_base_url: str
+    instance_url: str
     images_path: str
     minute: int = 0
     recents_file: str = "recent_files.txt"

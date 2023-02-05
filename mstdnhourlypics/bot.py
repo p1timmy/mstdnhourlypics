@@ -26,7 +26,7 @@ class Bot:
             client_id=secrets.client_key,
             client_secret=secrets.client_secret,
             access_token=secrets.access_token,
-            api_base_url=self.settings.api_base_url,
+            api_base_url=self.settings.instance_url,
         )
         self.logged_in = False
         self._delay = 1
