@@ -11,7 +11,6 @@ from mastodon import Mastodon, MastodonError
 from mstdnhourlypics.settings import Secrets, Settings, get_secrets, get_settings
 from mstdnhourlypics.utils import is_image_file
 
-
 _logger = logging.getLogger(__name__)
 
 
@@ -35,6 +34,16 @@ class Bot:
         self._delay = random.randint(1, 30)
 
     def load_recents_file(self):
+        """
+        Load a list of filenames of the most recently-sent images
+
+        The location of the recent files list is determined by the `recents_file` setting.
+        By default, this is `recent_files.txt` on the current working directory.
+
+        If the path to the recent pics file doesn't exist, it will be created after the
+        next time a post was successfully published.
+        """
+
         if self.settings.recents_file not in os.listdir():
             _logger.info(
                 (
@@ -58,11 +67,21 @@ class Bot:
             )
 
     def log_in(self):
+        """
+        Verify that the bot application is working and log the username linked to the app
+
+        Required before calling `run()`
+        """
         account_info = self.mastodon_client.account_verify_credentials()
         _logger.info("Logged in as @%s", account_info["username"])
         self.logged_in = True
 
     def fill_queue(self):
+        """
+        Fill the image queue with new images until its size is equal to the `image_queue_size`
+        setting
+        """
+
         files = list(
             filter(lambda f: is_image_file(f), os.listdir(self.settings.images_path))
         )
@@ -77,6 +96,13 @@ class Bot:
         _logger.info("Added %s image%s to queue", counter, "s" if counter != 1 else "")
 
     def send_post(self, media_path: str, body="") -> Union[Dict, None]:
+        """
+        Upload media and publish a new post with that media to the Mastodon instance
+
+        Returns a status dict if the post was published, or None if the instance returned
+        an API error
+        """
+
         media_id = ""
         while True:
             try:
@@ -96,6 +122,13 @@ class Bot:
                 return None
 
     def post_image(self, no_delay: bool = False):
+        """
+        Post a new image to Mastodon
+
+        If `no_delay` is `True`, the bot will not wait for a random period of time before
+        sending a new post.
+        """
+
         # Step 1: Fill up queue if empty
         if len(self.image_queue) < 1:
             self.fill_queue()
@@ -132,6 +165,13 @@ class Bot:
             )
 
     def set_up(self):
+        """
+        Sets up the `Bot` with one function
+
+        This loads the list of recently-sent images, logs in the bot, and sets a new delay
+        for the next scheduled post
+        """
+
         # Make sure the images directory exists and is accessible
         os.listdir(self.settings.images_path)
 
@@ -140,6 +180,12 @@ class Bot:
         self._update_delay()
 
     def run(self):
+        """
+        The main loop of the `Bot` where scheduled posts are made
+
+        Remember to call `log_in()` or `set_up()` first before running this function
+        """
+
         assert (
             self.logged_in
         ), "you must run 'set_up()' or 'log_in()' first before running this function"
