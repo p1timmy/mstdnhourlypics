@@ -69,7 +69,9 @@ class Bot:
         counter = 0
         while len(self.image_queue) < self.settings.image_queue_size:
             filename = random.choice(files)
-            if not (filename in self.image_queue or filename in self.recent_files):
+            if filename not in self.image_queue or (
+                filename not in self.recent_files and self.settings.image_queue_size > 1
+            ):
                 self.image_queue.appendleft(filename)
                 counter += 1
         _logger.info("Added %s image%s to queue", counter, "s" if counter != 1 else "")
