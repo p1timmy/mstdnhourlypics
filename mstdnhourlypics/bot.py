@@ -32,7 +32,7 @@ class Bot:
         self._delay = 1
 
     def _update_delay(self):
-        self._delay = random.randrange(1, 30)
+        self._delay = random.randint(1, 30)
 
     def load_recents_file(self):
         if self.settings.recents_file not in os.listdir():
