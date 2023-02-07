@@ -4,7 +4,6 @@ from functools import lru_cache
 import tyaml
 from enforce_typing import enforce_types
 
-
 SETTINGS_FILE = "settings.yaml"
 SECRETS_FILE = "secrets.yaml"
 
@@ -36,7 +35,7 @@ class Secrets:
     access_token: str
 
 
-@lru_cache
+@lru_cache()
 def get_settings() -> Settings:
     with open(SETTINGS_FILE) as settings_file:
         settings = tyaml.load(settings_file.read(), Settings)
@@ -45,7 +44,7 @@ def get_settings() -> Settings:
         return settings
 
 
-@lru_cache
+@lru_cache()
 def get_secrets() -> Secrets:
     with open(SECRETS_FILE) as secrets_file:
         secrets = tyaml.load(secrets_file.read(), Secrets)
